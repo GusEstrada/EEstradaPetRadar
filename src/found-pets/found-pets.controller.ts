@@ -1,14 +1,13 @@
 import { Body, Controller, Post, Get, UseInterceptors } from '@nestjs/common';
-import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import { FoundPetsService } from './found-pets.service';
-import type { FoundPetCDto } from 'src/core/models/found-pet.model';
 
 @Controller('found-pets')
 export class FoundPetsController {
   constructor(private readonly foundPetsService: FoundPetsService) {}
 
   @Post()
-  async createFoundPet(@Body() foundPet: FoundPetCDto) {
+  async createFoundPet(@Body() foundPet: any) {
     const result = await this.foundPetsService.createFoundPet(foundPet);
 
     return {
@@ -19,6 +18,7 @@ export class FoundPetsController {
 
   @UseInterceptors(CacheInterceptor)
   @CacheKey('all_found_pets')
+  @CacheTTL(60) // El caché expira en 60 segundos
   @Get()
   async getFoundPets() {
     return this.foundPetsService.findAll();
