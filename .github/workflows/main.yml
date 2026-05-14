@@ -27,4 +27,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}/pet-radar:latest
+          tags: ghcr.io/gusestrada/eestradapetradar/pet-radar:latest
