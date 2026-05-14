@@ -22,9 +22,8 @@ export class FoundPetsService {
   ) {}
 
   async createFoundPet(foundPet: any): Promise<boolean> {
-    // 1. Extraemos las coordenadas del objeto location que viene de Postman
-    const lon = foundPet.location?.coordinates[0];
-    const lat = foundPet.location?.coordinates[1];
+const lon = foundPet.lon;
+const lat = foundPet.lat;;
 
     if (lon === undefined || lat === undefined) {
       console.error(' Error: No se recibieron coordenadas válidas en el body.');
@@ -53,7 +52,6 @@ export class FoundPetsService {
 
     await this.foundPetRepository.save(newFoundPet);
 
-    // 2. Query de PostGIS para buscar mascotas a 500 metros a la redonda
     const nearbyLostPets = await this.lostPetRepository.query(
       `
       SELECT *,

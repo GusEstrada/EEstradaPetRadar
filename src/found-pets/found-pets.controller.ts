@@ -18,7 +18,7 @@ export class FoundPetsController {
 
   @UseInterceptors(CacheInterceptor)
   @CacheKey('all_found_pets')
-  @CacheTTL(60) // El caché expira en 60 segundos
+  @CacheTTL(60) 
   @Get()
   async getFoundPets() {
     return this.foundPetsService.findAll();

@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
+import * as appInsights from 'applicationinsights'; 
 
 import { FoundPetsModule } from './found-pets/found-pets.module';
 import { LostPetsModule } from './lost-pets/lost-pets.module';
@@ -16,7 +17,7 @@ import { envs } from './config/envs';
       useFactory: async () => ({
         store: await redisStore({
           socket: {
-            host: 'localhost',
+            host: 'localhost', 
             port: 6379,
           },
           ttl: 60000, 
@@ -32,7 +33,7 @@ import { envs } from './config/envs';
       password: envs.DB_PASSWORD,
       database: envs.DB_NAME,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: true, 
     }),
 
     FoundPetsModule,
@@ -40,4 +41,16 @@ import { envs } from './config/envs';
     EmailModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  onModuleInit() {
+    if (envs.AZURE_INSIGHTS_CONNECTION_STRING) {
+      appInsights.setup(envs.AZURE_INSIGHTS_CONNECTION_STRING)
+        .setAutoDependencyCorrelation(true)
+        .setAutoCollectRequests(true)
+        .setAutoCollectPerformance(true, true)
+        .setAutoCollectExceptions(true)
+        .start();
+      console.log('Azure Application Insights iniciado en PetRadar');
+    }
+  }
+}
