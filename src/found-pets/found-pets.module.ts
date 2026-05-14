@@ -7,11 +7,8 @@ import { LostPet } from 'src/core/entities/lost-pet.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    EmailModule,
-    TypeOrmModule.forFeature([FoundPet, LostPet])
-  ],
+  imports: [EmailModule, TypeOrmModule.forFeature([FoundPet, LostPet])],
   controllers: [FoundPetsController],
-  providers: [FoundPetsService]
+  providers: [FoundPetsService],
 })
 export class FoundPetsModule {}

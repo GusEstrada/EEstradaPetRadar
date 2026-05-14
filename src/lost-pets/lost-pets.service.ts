@@ -6,14 +6,12 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class LostPetsService {
-
   constructor(
     @InjectRepository(LostPet)
-    private readonly lostPetRepository: Repository<LostPet>
+    private readonly lostPetRepository: Repository<LostPet>,
   ) {}
 
   async createLostPet(lostPet: LostPetCDto): Promise<boolean> {
-
     const newLostPet = this.lostPetRepository.create({
       name: lostPet.name,
       species: lostPet.species,
@@ -29,12 +27,18 @@ export class LostPetsService {
       lost_date: lostPet.lost_date,
       location: {
         type: 'Point',
-        coordinates: [lostPet.lon, lostPet.lat]
-      }
+        coordinates: [lostPet.lon, lostPet.lat],
+      },
     });
 
     await this.lostPetRepository.save(newLostPet);
 
     return true;
+  }
+
+  async findAllActive() {
+    return this.lostPetRepository.find({
+      where: { is_active: true },
+    });
   }
 }

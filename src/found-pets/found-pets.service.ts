@@ -1,61 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
 import { Repository } from 'typeorm';
 
 import { FoundPet } from 'src/core/entities/found-pet.entity';
 import { LostPet } from 'src/core/entities/lost-pet.entity';
-
-import type { FoundPetCDto } from 'src/core/models/found-pet.model';
-
 import { EmailService } from 'src/email/email.service';
 import { generateFoundPetEmailTemplate } from './templates/found-pet.template';
 import type { EmailOptions } from 'src/core/models/email-options.model';
-
 import { envs } from 'src/config/envs';
 
 @Injectable()
 export class FoundPetsService {
-
   constructor(
-
     @InjectRepository(FoundPet)
     private readonly foundPetRepository: Repository<FoundPet>,
 
     @InjectRepository(LostPet)
     private readonly lostPetRepository: Repository<LostPet>,
 
-    private readonly emailService: EmailService
-
+    private readonly emailService: EmailService,
   ) {}
 
-  async createFoundPet(foundPet: FoundPetCDto): Promise<boolean> {
+  async createFoundPet(foundPet: any): Promise<boolean> {
+    // 1. Extraemos las coordenadas del objeto location que viene de Postman
+    const lon = foundPet.location?.coordinates[0];
+    const lat = foundPet.location?.coordinates[1];
+
+    if (lon === undefined || lat === undefined) {
+      console.error(' Error: No se recibieron coordenadas válidas en el body.');
+      return false;
+    }
+
+    console.log(`📍 Procesando reporte en: [${lon}, ${lat}]`);
 
     const newFoundPet = this.foundPetRepository.create({
-
       species: foundPet.species,
       breed: foundPet.breed,
       color: foundPet.color,
       size: foundPet.size,
       description: foundPet.description,
       photo_url: foundPet.photo_url,
-
       finder_name: foundPet.finder_name,
       finder_email: foundPet.finder_email,
       finder_phone: foundPet.finder_phone,
-
       address: foundPet.address,
       found_date: foundPet.found_date,
-
       location: {
         type: 'Point',
-        coordinates: [foundPet.lon, foundPet.lat]
-      }
-
+        coordinates: [lon, lat],
+      },
     });
 
     await this.foundPetRepository.save(newFoundPet);
 
+    // 2. Query de PostGIS para buscar mascotas a 500 metros a la redonda
     const nearbyLostPets = await this.lostPetRepository.query(
       `
       SELECT *,
@@ -74,43 +72,48 @@ export class FoundPetsService {
       )
       ORDER BY distance ASC;
       `,
-      [foundPet.lon, foundPet.lat]
+      [lon, lat],
     );
 
-    if (nearbyLostPets.length > 0) {
+    console.log(`🔎 Buscando coincidencias... Encontradas: ${nearbyLostPets.length}`);
 
+    if (nearbyLostPets.length > 0) {
       for (const lostPet of nearbyLostPets) {
+        console.log(`🎯 ¡Match! Avisando a: ${lostPet.owner_email}`);
 
         const lostPetWithCoords = {
           ...lostPet,
           location: {
             type: 'Point',
-            coordinates: [
-              parseFloat(lostPet.lon),
-              parseFloat(lostPet.lat)
-            ]
-          }
+            coordinates: [parseFloat(lostPet.lon), parseFloat(lostPet.lat)],
+          },
         };
 
         const template = generateFoundPetEmailTemplate(
           foundPet,
-          lostPetWithCoords
+          lostPetWithCoords,
         );
 
         const options: EmailOptions = {
-          to: envs.MAILER_EMAIL!,
+          to: lostPet.owner_email,
           subject: `🐾 Posible coincidencia para ${lostPet.name}`,
-          htmlBody: template
+          htmlBody: template,
         };
 
-        await this.emailService.sendEmail(options);
-
+        try {
+          await this.emailService.sendEmail(options);
+        } catch (error) {
+          console.error(` No se pudo enviar el correo a ${lostPet.owner_email}:`, error.message);
+        }
       }
-
+    } else {
+      console.log('--- No hubo coincidencias geográficas cerca de este punto ---');
     }
 
     return true;
-
   }
 
+  async findAll() {
+    return this.foundPetRepository.find();
+  }
 }

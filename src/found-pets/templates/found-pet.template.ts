@@ -3,9 +3,8 @@ import { LostPet } from 'src/core/entities/lost-pet.entity';
 
 export const generateFoundPetEmailTemplate = (
   foundPet: FoundPetCDto,
-  lostPet: LostPet
+  lostPet: LostPet,
 ): string => {
-
   return `
   <div style="font-family: Arial, sans-serif; padding:20px;">
     

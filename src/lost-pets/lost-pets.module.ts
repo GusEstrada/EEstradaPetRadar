@@ -7,6 +7,6 @@ import { LostPetsService } from './lost-pets.service';
 @Module({
   imports: [TypeOrmModule.forFeature([LostPet])],
   controllers: [LostPetsController],
-  providers: [LostPetsService]
+  providers: [LostPetsService],
 })
 export class LostPetsModule {}

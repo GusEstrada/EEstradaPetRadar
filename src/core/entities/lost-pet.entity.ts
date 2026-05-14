@@ -1,11 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { PetSpecies } from '../enums/pet-species-enum';
 import { PetSize } from '../enums/pet-size-enum';
 import type { Point } from 'typeorm';
 
 @Entity('lost_pets')
 export class LostPet {
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -42,7 +47,7 @@ export class LostPet {
   @Column({
     type: 'geometry',
     spatialFeatureType: 'Point',
-    srid: 4326
+    srid: 4326,
   })
   location: Point;
 

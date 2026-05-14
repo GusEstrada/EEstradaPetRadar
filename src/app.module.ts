@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 import { FoundPetsModule } from './found-pets/found-pets.module';
 import { LostPetsModule } from './lost-pets/lost-pets.module';
@@ -9,31 +11,33 @@ import { envs } from './config/envs';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: 'localhost',
+            port: 6379,
+          },
+          ttl: 60000, 
+        }),
+      }),
+    }),
 
     TypeOrmModule.forRoot({
-
       type: 'postgres',
-
       host: envs.DB_HOST,
-
       port: envs.DB_PORT,
-
       username: envs.DB_USER,
-
       password: envs.DB_PASSWORD,
-
       database: envs.DB_NAME,
-
       autoLoadEntities: true,
-
-      synchronize: true
-
+      synchronize: true,
     }),
 
     FoundPetsModule,
     LostPetsModule,
-    EmailModule
-
-  ]
+    EmailModule,
+  ],
 })
 export class AppModule {}
