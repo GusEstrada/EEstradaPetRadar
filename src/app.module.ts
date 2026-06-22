@@ -14,15 +14,20 @@ import { envs } from './config/envs';
   imports: [
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: async () => ({
-        store: await redisStore({
-          socket: {
-            host: 'localhost',
-            port: 6379,
-          },
-          ttl: 60000,
-        }),
-      }),
+      useFactory: async () => {
+        if (envs.REDIS_HOST) {
+          return {
+            store: await redisStore({
+              socket: {
+                host: envs.REDIS_HOST,
+                port: envs.REDIS_PORT,
+              },
+              ttl: 60000,
+            }),
+          };
+        }
+        return { ttl: 60000 };
+      },
     }),
 
     TypeOrmModule.forRoot({
