@@ -13,7 +13,7 @@ export class LostPetsController {
 
   @UseInterceptors(CacheInterceptor)
   @CacheKey('active_lost_pets')
-  @CacheTTL(60) 
+  @CacheTTL(60)
   @Get()
   async getActiveLostPets() {
     return this.lostPetsService.findAllActive();

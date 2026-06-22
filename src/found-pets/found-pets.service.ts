@@ -22,8 +22,8 @@ export class FoundPetsService {
   ) {}
 
   async createFoundPet(foundPet: any): Promise<boolean> {
-const lon = foundPet.lon;
-const lat = foundPet.lat;;
+    const lon = foundPet.lon;
+    const lat = foundPet.lat;
 
     if (lon === undefined || lat === undefined) {
       console.error(' Error: No se recibieron coordenadas válidas en el body.');
@@ -73,7 +73,9 @@ const lat = foundPet.lat;;
       [lon, lat],
     );
 
-    console.log(`🔎 Buscando coincidencias... Encontradas: ${nearbyLostPets.length}`);
+    console.log(
+      `🔎 Buscando coincidencias... Encontradas: ${nearbyLostPets.length}`,
+    );
 
     if (nearbyLostPets.length > 0) {
       for (const lostPet of nearbyLostPets) {
@@ -101,11 +103,16 @@ const lat = foundPet.lat;;
         try {
           await this.emailService.sendEmail(options);
         } catch (error) {
-          console.error(` No se pudo enviar el correo a ${lostPet.owner_email}:`, error.message);
+          console.error(
+            ` No se pudo enviar el correo a ${lostPet.owner_email}:`,
+            error.message,
+          );
         }
       }
     } else {
-      console.log('--- No hubo coincidencias geográficas cerca de este punto ---');
+      console.log(
+        '--- No hubo coincidencias geográficas cerca de este punto ---',
+      );
     }
 
     return true;

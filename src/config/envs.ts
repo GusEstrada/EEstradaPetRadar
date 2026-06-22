@@ -1,7 +1,6 @@
 import 'dotenv/config';
 
 export const envs = {
-  // Base de Datos PostgreSQL con PostGIS
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_PORT: Number(process.env.DB_PORT) || 5433,
   DB_USER: process.env.DB_USER || 'postgres',
@@ -11,5 +10,6 @@ export const envs = {
   MAILER_EMAIL: process.env.MAILER_EMAIL || 'test@test.com',
   MAILER_SECRET_KEY: process.env.MAILER_SECRET_KEY || 'test',
 
-  AZURE_INSIGHTS_CONNECTION_STRING: process.env.APPINSIGHTS_CONNECTION_STRING || '',
+  AZURE_INSIGHTS_CONNECTION_STRING:
+    process.env.APPINSIGHTS_CONNECTION_STRING || '',
 };

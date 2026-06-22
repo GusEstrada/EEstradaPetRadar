@@ -9,7 +9,7 @@ export class EmailService {
     service: 'gmail',
     auth: {
       user: envs.MAILER_EMAIL,
-      pass: envs.MAILER_SECRET_KEY, 
+      pass: envs.MAILER_SECRET_KEY,
     },
   });
 

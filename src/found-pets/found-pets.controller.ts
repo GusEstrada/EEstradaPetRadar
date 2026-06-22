@@ -18,7 +18,7 @@ export class FoundPetsController {
 
   @UseInterceptors(CacheInterceptor)
   @CacheKey('all_found_pets')
-  @CacheTTL(60) 
+  @CacheTTL(60)
   @Get()
   async getFoundPets() {
     return this.foundPetsService.findAll();

@@ -6,7 +6,8 @@ import { envs } from './config/envs'; // Asegúrate de que esta ruta sea correct
 async function bootstrap() {
   // Cambia APPINSIGHTS_CONNECTION_STRING por AZURE_INSIGHTS_CONNECTION_STRING
   if (envs.AZURE_INSIGHTS_CONNECTION_STRING) {
-    appInsights.setup(envs.AZURE_INSIGHTS_CONNECTION_STRING)
+    appInsights
+      .setup(envs.AZURE_INSIGHTS_CONNECTION_STRING)
       .setAutoDependencyCorrelation(true)
       .setAutoCollectRequests(true)
       .setAutoCollectPerformance(true, true)
