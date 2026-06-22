@@ -17,8 +17,8 @@ import { envs } from './config/envs';
       useFactory: async () => ({
         store: await redisStore({
           socket: {
-            host: 'localhost',
-            port: 6379,
+            host: envs.REDIS_HOST,
+            port: envs.REDIS_PORT,
           },
           ttl: 60000,
         }),
